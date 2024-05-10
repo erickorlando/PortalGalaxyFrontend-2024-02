@@ -22,4 +22,12 @@
     <ProjectReference Include="..\PortalGalaxy.Shared\PortalGalaxy.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Genericos\BotonesAccion.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="Genericos\BotonesAccion.razor" />
+  </ItemGroup>
+
 </Project>
