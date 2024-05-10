@@ -1,0 +1,71 @@
+﻿@page "/taller/list"
+@inject ITallerProxy Proxy
+@inject NavigationManager Nav
+@inject IToastService Toaster
+
+
+<ListaGenerica TItem="TallerDtoResponse" Lista="Talleres"
+               Titulo="Lista de Talleres" >
+    <Cabeceras>
+        <th>Id</th>
+        <th>Taller</th>
+        <th>Categoria</th>
+        <th>Instructor</th>
+        <th>Fecha</th>
+        <th>Situacion</th>
+    </Cabeceras>
+    <Detalles>
+        <td>@context.Id</td>
+        <td>@context.Nombre</td>
+        <td>@context.Categoria</td>
+        <td>@context.Instructor</td>
+        <td>@context.Fecha</td>
+        <td>@context.Situacion</td>
+        <td>
+            <BotonesAccion TItem="TallerDtoResponse"
+                           Item="context"
+            />
+        </td>
+    </Detalles>
+</ListaGenerica>
+
+<LoadingComponent IsLoading="IsLoading" />
+
+@code {
+
+    public BusquedaTallerRequest BusquedaRequest { get; set; } = new()
+    {
+        Pagina = 1,
+        Filas = 5
+    };
+    public ICollection<TallerDtoResponse>? Talleres { get; set; }
+
+    public bool IsLoading { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await OnSearch();
+    }
+
+    private async Task OnSearch()
+    {
+        try
+        {
+            IsLoading = true;
+
+            var response = await Proxy.ListAsync(BusquedaRequest);
+
+            Talleres = response.Data;
+
+            Toaster.ShowInfo($"Total de paginas: {response.TotalPages}");
+        }
+        catch (Exception ex)
+        {
+            Toaster.ShowError(ex.Message);
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
+}
