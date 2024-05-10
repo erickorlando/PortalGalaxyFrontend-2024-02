@@ -1,0 +1,62 @@
+﻿@typeparam TItem where TItem : class
+
+<h2 class="text-uppercase mb-5">@Titulo</h2>
+<div class="row mt-3 justify-content-end">
+    <div class="col-auto">
+        <button class="btn btn-primary" @onclick="OnNuevo"><i class="bi bi-plus-circle me-1"></i>Nuevo</button>
+    </div>
+</div>
+<div class="row mt-4 p-2">
+    @if (Lista is null)
+    {
+        <p class="alert alert-info">Sin resultados</p>
+    }
+    else if (!Lista.Any())
+    {
+        <p class="alert alert-danger">Sin datos para mostrar</p>
+    }
+    else
+    {
+        <table class="table table-hover table-bordered">
+            <thead>
+            <tr class="table-primary">
+                @Cabeceras
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var item in Lista)
+            {
+                <tr>
+                    @Detalles(item)
+                </tr>
+            }
+            </tbody>
+        </table>
+    }
+</div>
+
+@code {
+
+    [Parameter] public string Titulo { get; set; } = "Listado";
+
+    [Parameter] public ICollection<TItem>? Lista { get; set; }
+
+    [Parameter] public EventCallback BotonNuevo { get; set; }
+
+    [Parameter] public EventCallback<TItem> OnEditar { get; set; }
+
+    [Parameter] public EventCallback<TItem> OnEliminar { get; set; }
+
+    [Parameter] [EditorRequired] 
+    public RenderFragment Cabeceras { get; set; } = default!;
+
+    [Parameter]
+    [EditorRequired]
+    public RenderFragment<TItem> Detalles { get; set; } = default!;
+
+    private void OnNuevo()
+    {
+        BotonNuevo.InvokeAsync();
+    }
+
+}

@@ -1,0 +1,42 @@
+﻿@page "/categorias/editar/{Id:int}"
+@inject ICategoriaProxy Proxy
+@inject NavigationManager NavigationManager
+@inject IToastService ToastService
+
+<EditCategoriaComponent Request="Request" Titulo="Editar Categoria" OnGrabar="OnActualizar" />
+
+<LoadingComponent IsLoading="IsLoading" />
+
+@code {
+    
+    [Parameter]
+    public int Id { get; set; }
+
+    public CategoriaDtoRequest Request { get; set; } = new();
+    public bool IsLoading { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        Request = await Proxy.FindByIdAsync(Id);
+    }
+
+    private async Task OnActualizar()
+    {
+        try
+        {
+            IsLoading = true;
+            await Proxy.UpdateAsync(Id, Request);
+            ToastService.ShowSuccess("Registro actualizado");
+            NavigationManager.NavigateTo("/categorias/list");
+        }
+        catch (Exception ex)
+        {
+            ToastService.ShowError(ex.Message);
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
+
+}
