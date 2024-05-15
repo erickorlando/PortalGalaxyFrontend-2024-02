@@ -1,18 +1,61 @@
 ﻿@page "/taller/list"
 @inject ITallerProxy Proxy
+@inject IJsonProxy JsonProxy
+@inject ICategoriaProxy CategoriaProxy
 @inject NavigationManager Nav
 @inject IToastService Toaster
 
-
 <ListaGenerica TItem="TallerDtoResponse" Lista="Talleres"
-               Titulo="Lista de Talleres" >
+               Titulo="Lista de Talleres">
+    <Filtros>
+        <div class="row">
+            <div class="col">
+                <div class="mb-3">
+                    <label for="nombre" class="form-label">Nombre:</label>
+                    <InputText type="text" class="form-control" id="nombre" @bind-Value="BusquedaRequest.Nombre" />
+                </div>
+            </div>
+            <div class="col-3">
+                <label for="categoria" class="form-label">Categoría:</label>
+                <InputSelect id="categoria" class="form-select" @bind-Value="BusquedaRequest.CategoriaId">
+                    <options>Todos</options>
+                    @foreach (var item in Categorias)
+                    {
+                        <option value="@item.Id">@item.Nombre</option>
+                    }
+                </InputSelect>
+            </div>
+            <div class="col-3">
+                <label for="situacion" class="form-label">Situación:</label>
+                <InputSelect id="situacion" class="form-select" @bind-Value="BusquedaRequest.Situacion">
+                    <options>Todos</options>
+                    @foreach (var item in Situaciones)
+                    {
+                        <option value="@item.Codigo">@item.Nombre</option>
+                    }
+                </InputSelect>
+            </div>
+        </div>
+        <div class="row mt-3 justify-content-end">
+            <div class="col-auto">
+                <button class="btn btn-outline-primary" @onclick="OnSearch"><i class="bi bi-search me-1"></i>Buscar</button>
+            </div>
+            <div class="col-auto">
+                <button class="btn btn-outline-primary" @onclick="OnLimpiar"><i class="bi bi-eraser-fill me-1"></i>Limpiar</button>
+            </div>
+            <div class="col-auto">
+                <button class="btn btn-primary" @onclick="OnNuevo"><i class="bi bi-plus-circle me-1"></i>Nuevo</button>
+            </div>
+        </div>
+    </Filtros>
     <Cabeceras>
-        <th>Id</th>
+        <th>#</th>
         <th>Taller</th>
         <th>Categoria</th>
         <th>Instructor</th>
         <th>Fecha</th>
         <th>Situacion</th>
+        <th>Acción</th>
     </Cabeceras>
     <Detalles>
         <td>@context.Id</td>
@@ -23,11 +66,12 @@
         <td>@context.Situacion</td>
         <td>
             <BotonesAccion TItem="TallerDtoResponse"
-                           Item="context"
-            />
+                           Item="context"/>
         </td>
     </Detalles>
 </ListaGenerica>
+
+<DataPager Result="PagedResult" OnPageChanged="PaginaCambiada" OnPageSizeChanged="FilasPorPagina" />
 
 <LoadingComponent IsLoading="IsLoading" />
 
@@ -35,6 +79,7 @@
 
     public BusquedaTallerRequest BusquedaRequest { get; set; } = new()
     {
+        Nombre = string.Empty,
         Pagina = 1,
         Filas = 5
     };
@@ -42,9 +87,23 @@
 
     public bool IsLoading { get; set; }
 
+    public DataPager Paginador { get; set; } = default!;
+
+    public PagedResult<TallerDtoResponse> PagedResult { get; set; } = default!;
+
+    public ICollection<CategoriaDtoResponse> Categorias { get; set; } = new List<CategoriaDtoResponse>();
+    public ICollection<SituacionModel> Situaciones { get; set; } = new List<SituacionModel>();
+
     protected override async Task OnInitializedAsync()
     {
-        await OnSearch();
+        Categorias = await CategoriaProxy.ListAsync();
+        Situaciones = await JsonProxy.ListSituaciones();
+
+        PagedResult = new PagedResult<TallerDtoResponse>()
+        {
+            CurrentPage = BusquedaRequest.Pagina,
+            RowPerPage = BusquedaRequest.Filas
+        };
     }
 
     private async Task OnSearch()
@@ -56,8 +115,12 @@
             var response = await Proxy.ListAsync(BusquedaRequest);
 
             Talleres = response.Data;
-
-            Toaster.ShowInfo($"Total de paginas: {response.TotalPages}");
+            if (Talleres is not null)
+            {
+                PagedResult.Results = Talleres;
+                PagedResult.RowCount = Talleres.Count;
+                PagedResult.TotalPages = response.TotalPages;
+            }
         }
         catch (Exception ex)
         {
@@ -67,5 +130,30 @@
         {
             IsLoading = false;
         }
+    }
+
+    private void OnLimpiar()
+    {
+        BusquedaRequest = new() { Pagina = 1, Filas = 5 };
+    }
+
+    private void OnNuevo()
+    {
+        Nav.NavigateTo("/taller/nuevo");
+    }
+
+    private async Task PaginaCambiada()
+    {
+        IsLoading = true;
+        BusquedaRequest.Pagina = PagedResult.CurrentPage;
+        BusquedaRequest.Filas = PagedResult.RowPerPage;
+        await OnSearch();
+    }
+
+    private async Task FilasPorPagina()
+    {
+        BusquedaRequest.Pagina = PagedResult.CurrentPage;
+        BusquedaRequest.Filas = PagedResult.RowPerPage;
+        await OnSearch();
     }
 }
