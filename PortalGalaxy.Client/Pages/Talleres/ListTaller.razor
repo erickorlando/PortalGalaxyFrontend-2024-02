@@ -4,6 +4,7 @@
 @inject ICategoriaProxy CategoriaProxy
 @inject NavigationManager Nav
 @inject IToastService Toaster
+@inject SweetAlertService Swal
 
 <ListaGenerica TItem="TallerDtoResponse" Lista="Talleres"
                Titulo="Lista de Talleres">
@@ -65,8 +66,25 @@
         <td>@context.Fecha</td>
         <td>@context.Situacion</td>
         <td>
-            <BotonesAccion TItem="TallerDtoResponse"
-                           Item="context"/>
+            @switch (@context.Situacion)
+            {
+                case "Por Aperturar":
+                case "Aperturada":
+                    <i class="bi bi-check-circle-fill" style="color: green;"></i>
+                    break;
+                case "Cancelada":
+                    <i class="bi bi-dash-circle-fill" style="color: red;"></i>
+                    break;
+                default:
+                    <i class="bi bi-check2-circle"></i>
+                    break;
+            }
+            <button type="button" class="btn" @onclick="() => OnEditar(context.Id)">
+                <i class="bi bi-pencil-fill"></i>
+            </button>
+            <button type="button" class="btn" @onclick="() => OnEliminar(context.Id)">
+                <i class="bi bi-trash-fill"></i>
+            </button>
         </td>
     </Detalles>
 </ListaGenerica>
@@ -140,6 +158,36 @@
     private void OnNuevo()
     {
         Nav.NavigateTo("/taller/nuevo");
+    }
+
+    private void OnEditar(int id)
+    {
+        Nav.NavigateTo($"/taller/editar/{id}");
+    }
+
+    private async Task OnEliminar(int id)
+    {
+        try
+        {
+            var result = await Swal.FireAsync(new SweetAlertOptions
+            {
+                Text = "Desea eliminar el registro?",
+                Title = "Eliminar",
+                Icon = SweetAlertIcon.Question,
+                ShowCancelButton = true
+            });
+
+            if (result.IsConfirmed)
+            {
+                await Proxy.DeleteAsync(id);
+
+                await OnSearch();
+            }
+        }
+        catch (Exception ex)
+        {
+            Toaster.ShowError(ex.Message);
+        }
     }
 
     private async Task PaginaCambiada()
