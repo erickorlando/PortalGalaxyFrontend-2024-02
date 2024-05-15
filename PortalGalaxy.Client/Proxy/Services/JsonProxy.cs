@@ -32,4 +32,11 @@ public class JsonProxy : IJsonProxy
         var distritos = await _httpClient.GetFromJsonAsync<List<DistritoModel>>("data/distritos.json");
         return distritos!.Where(d => d.CodProvincia == codProvincia).ToList();
     }
+
+    public async Task<ICollection<SituacionModel>> ListSituaciones()
+    {
+        var situaciones = await _httpClient.GetFromJsonAsync<List<SituacionModel>>("data/situaciones.json") 
+                          ?? new List<SituacionModel>();
+        return situaciones;
+    }
 }
