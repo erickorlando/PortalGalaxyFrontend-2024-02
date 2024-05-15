@@ -5,7 +5,7 @@
 <EditForm Model="Model" OnValidSubmit="Grabar">
     <DataAnnotationsValidator />
     <div class="row mb-4">
-        <div class="col-8">
+        <div class="col-lg-8 col-sm-12">
             <label for="nombre" class="form-label">Nombres</label>
             <input type="text" id="nombre" class="form-control" @bind-value="Model.Nombres" />
             <ValidationMessage For="() => Model.Nombres" />
@@ -15,9 +15,8 @@
             <input type="text" id="nrodocumento" class="form-control" @bind-value="Model.NroDocumento" />
             <ValidationMessage For="() => Model.NroDocumento" />
         </div>
-        <div class="row mt-2 align-items-end">
+        <div class="row mt-2 align-items-end justify-content-between">
             <div class="col-7">
-                <div>
                     <label for="categoria" class="form-label">Categoría</label>
                     <InputSelect id="categoria" class="form-select" @bind-Value="Model.CategoriaSeleccionada">
                         <option>Todos</option>
@@ -26,9 +25,8 @@
                             <option value="@item.Id">@item.Nombre</option>
                         }
                     </InputSelect>
-                </div>
             </div>
-            <div class="col offset-1">
+            <div class="col-auto">
                 <button type="button" class="btn btn-outline-primary" @onclick="Cargar"><i class="bi bi-search me-1"></i>Buscar</button>
             </div>
             <div class="col-auto">

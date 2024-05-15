@@ -1,4 +1,5 @@
 ﻿using System.Net.Http.Json;
+using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using PortalGalaxy.Client.Proxy.Interfaces;
 using PortalGalaxy.Shared.Response;
 
@@ -6,12 +7,14 @@ namespace PortalGalaxy.Client.Proxy.Services;
 
 public class JsonProxy : IJsonProxy
 {
+    private readonly IWebAssemblyHostEnvironment _webAssemblyHostEnvironment;
     private readonly HttpClient _httpClient;
 
-    public JsonProxy()
+    public JsonProxy(IWebAssemblyHostEnvironment webAssemblyHostEnvironment)
     {
+        _webAssemblyHostEnvironment = webAssemblyHostEnvironment;
         _httpClient = new HttpClient();
-        _httpClient.BaseAddress = new Uri("https://localhost:5000");
+        _httpClient.BaseAddress = new Uri(webAssemblyHostEnvironment.BaseAddress);
     }
     
     public async Task<ICollection<DepartamentoModel>> ListDepartamentos()
