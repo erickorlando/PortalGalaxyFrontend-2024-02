@@ -25,21 +25,23 @@ else
     }
     else
     {
-        <table class="table table-hover table-bordered">
-            <thead>
-            <tr class="table-primary">
-                @Cabeceras
-            </tr>
-            </thead>
-            <tbody>
-            @foreach (var item in Lista)
-            {
-                <tr>
-                    @Detalles(item)
-                </tr>
-            }
-            </tbody>
-        </table>
+        <div id="tablaConDatos">
+            <table class="table table-hover table-bordered">
+                <thead>
+                    <tr class="table-primary">
+                        @Cabeceras
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Lista)
+                    {
+                        <tr>
+                            @Detalles(item)
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
     }
 </div>
 
@@ -57,7 +59,8 @@ else
 
     [Parameter] public RenderFragment? Filtros { get; set; }
 
-    [Parameter] [EditorRequired] 
+    [Parameter]
+    [EditorRequired]
     public RenderFragment Cabeceras { get; set; } = default!;
 
     [Parameter]
