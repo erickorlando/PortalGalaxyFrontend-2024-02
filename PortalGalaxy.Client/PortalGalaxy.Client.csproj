@@ -30,6 +30,11 @@
 
   <ItemGroup>
     <_ContentIncludedByDefault Remove="Genericos\BotonesAccion.razor" />
+    <_ContentIncludedByDefault Remove="Pages\CatalogoTalleres.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Pages\CatalogoTalleres.razor" />
   </ItemGroup>
 
 </Project>
