@@ -18,6 +18,7 @@ builder.Services.AddSingleton(sp => new HttpClient { BaseAddress = new Uri(build
 builder.Services.AddBlazoredSessionStorage();
 builder.Services.AddBlazoredToast();
 builder.Services.AddSweetAlert2();
+builder.Services.AddBlazorBootstrap();
 
 // Registramos las dependencias de Repositories y Services (SCRUTOR)
 builder.Services.Scan(selector => selector
